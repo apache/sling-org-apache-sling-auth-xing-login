@@ -40,9 +40,9 @@
   </properties>
 
   <scm>
-    <connection>scm:svn:http://svn.apache.org/repos/asf/sling/trunk/contrib/auth/org.apache.sling.auth.xing.login</connection>
-    <developerConnection>scm:svn:https://svn.apache.org/repos/asf/sling/trunk/contrib/auth/org.apache.sling.auth.xing.login</developerConnection>
-    <url>http://svn.apache.org/viewvc/sling/trunk/contrib/auth/org.apache.sling.auth.xing.login</url>
+    <connection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-auth-xing-login.git</conncetion>
+    <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/sling-org-apache-sling-auth-xing-login.git</developerConnection>
+    <url>https://gitbox.apache.org/repos/asf?p=sling-org-apache-sling-auth-xing-login.git</url>
   </scm>
 
   <dependencies>
