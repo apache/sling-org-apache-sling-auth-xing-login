@@ -18,8 +18,6 @@
  */
 package org.apache.sling.auth.xing.login.impl;
 
-import java.util.Dictionary;
-
 import javax.jcr.Credentials;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
@@ -27,14 +25,6 @@ import javax.jcr.Value;
 import javax.jcr.ValueFactory;
 
 import org.apache.commons.lang.StringUtils;
-import org.apache.felix.scr.annotations.Activate;
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Deactivate;
-import org.apache.felix.scr.annotations.Modified;
-import org.apache.felix.scr.annotations.Properties;
-import org.apache.felix.scr.annotations.Property;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.Service;
 import org.apache.jackrabbit.api.security.user.User;
 import org.apache.jackrabbit.api.security.user.UserManager;
 import org.apache.sling.auth.xing.api.AbstractXingUserManager;
@@ -42,25 +32,26 @@ import org.apache.sling.auth.xing.api.XingUser;
 import org.apache.sling.auth.xing.login.XingLogin;
 import org.apache.sling.auth.xing.login.XingLoginUserManager;
 import org.apache.sling.auth.xing.login.XingLoginUtil;
-import org.apache.sling.commons.osgi.PropertiesUtil;
 import org.apache.sling.jcr.api.SlingRepository;
-import org.osgi.framework.Constants;
-import org.osgi.service.component.ComponentContext;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Modified;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.propertytypes.ServiceDescription;
+import org.osgi.service.component.propertytypes.ServiceRanking;
+import org.osgi.service.component.propertytypes.ServiceVendor;
+import org.osgi.service.metatype.annotations.AttributeDefinition;
+import org.osgi.service.metatype.annotations.Designate;
+import org.osgi.service.metatype.annotations.ObjectClassDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(
-    label = "Apache Sling Authentication XING Login “Default User Manager”",
-    description = "Default User Manager for Sling Authentication XING Login",
-    immediate = true,
-    metatype = true
-)
-@Service
-@Properties({
-    @Property(name = Constants.SERVICE_VENDOR, value = XingLogin.SERVICE_VENDOR),
-    @Property(name = Constants.SERVICE_DESCRIPTION, value = "Default User Manager for Sling Authentication XING Login"),
-    @Property(name = Constants.SERVICE_RANKING, intValue = 0, propertyPrivate = false)
-})
+@Component
+@ServiceRanking(0)
+@ServiceVendor(XingLogin.SERVICE_VENDOR)
+@ServiceDescription("Default User Manager for Sling Authentication XING Login")
+@Designate(ocd = DefaultXingLoginUserManager.Config.class)
 public class DefaultXingLoginUserManager extends AbstractXingUserManager implements XingLoginUserManager {
 
     private String secretKey;
@@ -76,20 +67,26 @@ public class DefaultXingLoginUserManager extends AbstractXingUserManager impleme
 
     private static final String DEFAULT_USER_HASH_PROPERTY = "hash";
 
-    @Property(value = "")
-    private static final String SECRET_KEY_PARAMETER = "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.secretKey";
+    @SuppressWarnings("java:S100")
+    @ObjectClassDefinition(name = "Apache Sling Authentication XING Login “Default User Manager”",
+            description = "Default User Manager for Sling Authentication XING Login")
+    public @interface Config {
 
-    @Property(value = DEFAULT_USER_DATA_PROPERTY)
-    private static final String USER_DATA_PROPERTY_PARAMETER = "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.user.property.data";
+        @AttributeDefinition
+        String org_apache_sling_auth_xing_login_impl_DefaultXingLoginUserManager_secretKey() default "";
 
-    @Property(value = DEFAULT_USER_HASH_PROPERTY)
-    private static final String USER_HASH_PROPERTY_PARAMETER = "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.user.property.hash";
+        @AttributeDefinition
+        String org_apache_sling_auth_xing_login_impl_DefaultXingLoginUserManager_user_property_data() default DEFAULT_USER_DATA_PROPERTY;
 
-    @Property(boolValue = DEFAULT_AUTO_CREATE_USER)
-    private static final String AUTO_CREATE_USER_PARAMETER = "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.user.create.auto";
+        @AttributeDefinition
+        String org_apache_sling_auth_xing_login_impl_DefaultXingLoginUserManager_user_property_hash() default DEFAULT_USER_HASH_PROPERTY;
 
-    @Property(boolValue = DEFAULT_AUTO_UPDATE_USER)
-    private static final String AUTO_UPDATE_USER_PARAMETER = "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.user.update.auto";
+        @AttributeDefinition
+        boolean org_apache_sling_auth_xing_login_impl_DefaultXingLoginUserManager_user_create_auto() default DEFAULT_AUTO_CREATE_USER;
+
+        @AttributeDefinition
+        boolean org_apache_sling_auth_xing_login_impl_DefaultXingLoginUserManager_user_update_auto() default DEFAULT_AUTO_UPDATE_USER;
+    }
 
     private final Logger logger = LoggerFactory.getLogger(DefaultXingLoginUserManager.class);
 
@@ -97,19 +94,19 @@ public class DefaultXingLoginUserManager extends AbstractXingUserManager impleme
     }
 
     @Activate
-    protected void activate(final ComponentContext componentContext) {
+    protected void activate(final Config config) {
         logger.debug("activate");
-        configure(componentContext);
+        configure(config);
     }
 
     @Modified
-    protected void modified(final ComponentContext componentContext) {
+    protected void modified(final Config config) {
         logger.debug("modified");
-        configure(componentContext);
+        configure(config);
     }
 
     @Deactivate
-    protected void deactivate(final ComponentContext componentContext) {
+    protected void deactivate(final Config config) {
         logger.debug("deactivate");
         if (session != null) {
             session.logout();
@@ -117,13 +114,12 @@ public class DefaultXingLoginUserManager extends AbstractXingUserManager impleme
         }
     }
 
-    protected synchronized void configure(final ComponentContext componentContext) {
-        final Dictionary properties = componentContext.getProperties();
-        secretKey = PropertiesUtil.toString(properties.get(SECRET_KEY_PARAMETER), "").trim();
-        userDataProperty = PropertiesUtil.toString(properties.get(USER_DATA_PROPERTY_PARAMETER), DEFAULT_USER_DATA_PROPERTY).trim();
-        userHashProperty = PropertiesUtil.toString(properties.get(USER_HASH_PROPERTY_PARAMETER), DEFAULT_USER_HASH_PROPERTY).trim();
-        autoCreateUser = PropertiesUtil.toBoolean(properties.get(AUTO_CREATE_USER_PARAMETER), DEFAULT_AUTO_CREATE_USER);
-        autoUpdateUser = PropertiesUtil.toBoolean(properties.get(AUTO_UPDATE_USER_PARAMETER), DEFAULT_AUTO_UPDATE_USER);
+    protected synchronized void configure(final Config config) {
+        secretKey = config.org_apache_sling_auth_xing_login_impl_DefaultXingLoginUserManager_secretKey().trim();
+        userDataProperty = config.org_apache_sling_auth_xing_login_impl_DefaultXingLoginUserManager_user_property_data().trim();
+        userHashProperty = config.org_apache_sling_auth_xing_login_impl_DefaultXingLoginUserManager_user_property_hash().trim();
+        autoCreateUser = config.org_apache_sling_auth_xing_login_impl_DefaultXingLoginUserManager_user_create_auto();
+        autoUpdateUser = config.org_apache_sling_auth_xing_login_impl_DefaultXingLoginUserManager_user_update_auto();
 
         if (StringUtils.isEmpty(secretKey)) {
             logger.warn("configured secret key is empty");
