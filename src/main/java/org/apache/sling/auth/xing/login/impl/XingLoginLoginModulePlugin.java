@@ -29,11 +29,6 @@ import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
 
-import org.apache.felix.scr.annotations.Component;
-import org.apache.felix.scr.annotations.Properties;
-import org.apache.felix.scr.annotations.Property;
-import org.apache.felix.scr.annotations.Reference;
-import org.apache.felix.scr.annotations.Service;
 import org.apache.jackrabbit.api.security.user.User;
 import org.apache.sling.auth.xing.login.XingLogin;
 import org.apache.sling.auth.xing.login.XingLoginUserManager;
@@ -41,24 +36,26 @@ import org.apache.sling.auth.xing.login.XingLoginUtil;
 import org.apache.sling.jcr.jackrabbit.server.security.AuthenticationPlugin;
 import org.apache.sling.jcr.jackrabbit.server.security.LoginModulePlugin;
 import org.osgi.framework.Constants;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.propertytypes.ServiceDescription;
+import org.osgi.service.component.propertytypes.ServiceRanking;
+import org.osgi.service.component.propertytypes.ServiceVendor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Component(
-    label = "Apache Sling Authentication XING Login “Login Module Plugin”",
-    description = "Login Module Plugin for Sling Authentication XING Login",
-    immediate = true,
-    metatype = true
-)
-@Service
-@Properties({
-    @Property(name = Constants.SERVICE_VENDOR, value = XingLogin.SERVICE_VENDOR),
-    @Property(name = Constants.SERVICE_DESCRIPTION, value = "Login Module Plugin for Sling Authentication XING Login"),
-    @Property(name = Constants.SERVICE_RANKING, intValue = 0, propertyPrivate = false)
-})
 /**
  * @see org.apache.jackrabbit.core.security.authentication.DefaultLoginModule
  */
+@Component(
+    /*label = "Apache Sling Authentication XING Login “Login Module Plugin”",
+    description = "Login Module Plugin for Sling Authentication XING Login",*/
+    immediate = true,
+    service = {}
+)
+@ServiceRanking(0)
+@ServiceVendor(XingLogin.SERVICE_VENDOR)
+@ServiceDescription("Login Module Plugin for Sling Authentication XING Login")
 public class XingLoginLoginModulePlugin implements LoginModulePlugin {
 
     @Reference
