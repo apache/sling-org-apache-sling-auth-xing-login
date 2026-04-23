@@ -86,5 +86,4 @@ public class XingLoginAuthenticationPlugin implements AuthenticationPlugin {
 
         return false;
     }
-
 }

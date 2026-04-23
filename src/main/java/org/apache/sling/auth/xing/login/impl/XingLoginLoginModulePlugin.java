@@ -18,16 +18,16 @@
  */
 package org.apache.sling.auth.xing.login.impl;
 
-import java.security.Principal;
-import java.util.Map;
-import java.util.Set;
-
 import javax.jcr.Credentials;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.security.auth.callback.CallbackHandler;
 import javax.security.auth.login.FailedLoginException;
 import javax.security.auth.login.LoginException;
+
+import java.security.Principal;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
@@ -45,11 +45,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component(
-    label = "Apache Sling Authentication XING Login “Login Module Plugin”",
-    description = "Login Module Plugin for Sling Authentication XING Login",
-    immediate = true,
-    metatype = true
-)
+        label = "Apache Sling Authentication XING Login “Login Module Plugin”",
+        description = "Login Module Plugin for Sling Authentication XING Login",
+        immediate = true,
+        metatype = true)
 @Service
 @Properties({
     @Property(name = Constants.SERVICE_VENDOR, value = XingLogin.SERVICE_VENDOR),
@@ -66,8 +65,7 @@ public class XingLoginLoginModulePlugin implements LoginModulePlugin {
 
     private final Logger logger = LoggerFactory.getLogger(XingLoginLoginModulePlugin.class);
 
-    public XingLoginLoginModulePlugin() {
-    }
+    public XingLoginLoginModulePlugin() {}
 
     @Override
     public boolean canHandle(final Credentials credentials) {
@@ -79,7 +77,8 @@ public class XingLoginLoginModulePlugin implements LoginModulePlugin {
     }
 
     @Override
-    public void doInit(final CallbackHandler callbackHandler, final Session session, final Map map) throws LoginException {
+    public void doInit(final CallbackHandler callbackHandler, final Session session, final Map map)
+            throws LoginException {
         logger.debug("doInit({}, {}, {})", callbackHandler, session, map);
     }
 
@@ -106,15 +105,16 @@ public class XingLoginLoginModulePlugin implements LoginModulePlugin {
     }
 
     @Override
-    public AuthenticationPlugin getAuthentication(final Principal principal, final Credentials credentials) throws RepositoryException {
+    public AuthenticationPlugin getAuthentication(final Principal principal, final Credentials credentials)
+            throws RepositoryException {
         logger.debug("getAuthentication({}, {})", principal, credentials);
         return new XingLoginAuthenticationPlugin(xingLoginUserManager);
     }
 
     @Override
-    public int impersonate(final Principal principal, final Credentials credentials) throws RepositoryException, FailedLoginException {
+    public int impersonate(final Principal principal, final Credentials credentials)
+            throws RepositoryException, FailedLoginException {
         logger.debug("impersonate({}, {})", principal, credentials);
         return LoginModulePlugin.IMPERSONATION_DEFAULT;
     }
-
 }

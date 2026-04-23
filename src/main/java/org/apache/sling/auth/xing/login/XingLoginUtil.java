@@ -18,6 +18,11 @@
  */
 package org.apache.sling.auth.xing.login;
 
+import javax.crypto.Mac;
+import javax.crypto.spec.SecretKeySpec;
+import javax.jcr.Credentials;
+import javax.jcr.SimpleCredentials;
+
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -26,11 +31,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
-import javax.jcr.Credentials;
-import javax.jcr.SimpleCredentials;
 
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
@@ -71,11 +71,14 @@ public class XingLoginUtil {
     }
 
     public static XingUser fromJson(final String json) {
-        final Gson gson = new GsonBuilder().setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES).create();
+        final Gson gson = new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create();
         return gson.fromJson(json, XingUser.class);
     }
 
-    public static String hash(final String json, final String secretKey, final String hashAlgorithm) throws InvalidKeyException, NoSuchAlgorithmException, UnsupportedEncodingException {
+    public static String hash(final String json, final String secretKey, final String hashAlgorithm)
+            throws InvalidKeyException, NoSuchAlgorithmException, UnsupportedEncodingException {
         final Gson gson = new Gson();
         final List<String> list = new ArrayList<String>();
         final Map map = gson.fromJson(json, Map.class);
@@ -93,16 +96,17 @@ public class XingLoginUtil {
                 final Map m = (Map) entry.getValue();
                 join(m, list, prefix.concat(entry.getKey().toString()));
             } else {
-                list.add(prefix.concat(entry.getKey().toString()).concat(entry.getValue().toString()));
+                list.add(prefix.concat(entry.getKey().toString())
+                        .concat(entry.getValue().toString()));
             }
         }
     }
 
-    private static byte[] hmac(final String message, final String secretKey, final String hashAlgorithm) throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
+    private static byte[] hmac(final String message, final String secretKey, final String hashAlgorithm)
+            throws NoSuchAlgorithmException, InvalidKeyException, UnsupportedEncodingException {
         final SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), hashAlgorithm);
         final Mac mac = Mac.getInstance(hashAlgorithm);
         mac.init(secretKeySpec);
         return mac.doFinal(message.getBytes("UTF-8"));
     }
-
 }

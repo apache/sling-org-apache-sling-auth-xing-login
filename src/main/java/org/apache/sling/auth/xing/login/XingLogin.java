@@ -36,5 +36,4 @@ public class XingLogin {
     public static final String HASH_ALGORITHM = "HmacSHA256";
 
     public static final String SERVICE_VENDOR = "The Apache Software Foundation";
-
 }

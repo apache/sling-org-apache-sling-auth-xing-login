@@ -16,5 +16,5 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-@aQute.bnd.annotation.Version("0.0.2")
+@org.osgi.annotation.versioning.Version("0.0.2")
 package org.apache.sling.auth.xing.login;

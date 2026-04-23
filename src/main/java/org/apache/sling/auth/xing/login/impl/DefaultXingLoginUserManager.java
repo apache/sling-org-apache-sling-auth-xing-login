@@ -18,13 +18,13 @@
  */
 package org.apache.sling.auth.xing.login.impl;
 
-import java.util.Dictionary;
-
 import javax.jcr.Credentials;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.jcr.Value;
 import javax.jcr.ValueFactory;
+
+import java.util.Dictionary;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.felix.scr.annotations.Activate;
@@ -50,11 +50,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component(
-    label = "Apache Sling Authentication XING Login “Default User Manager”",
-    description = "Default User Manager for Sling Authentication XING Login",
-    immediate = true,
-    metatype = true
-)
+        label = "Apache Sling Authentication XING Login “Default User Manager”",
+        description = "Default User Manager for Sling Authentication XING Login",
+        immediate = true,
+        metatype = true)
 @Service
 @Properties({
     @Property(name = Constants.SERVICE_VENDOR, value = XingLogin.SERVICE_VENDOR),
@@ -77,24 +76,28 @@ public class DefaultXingLoginUserManager extends AbstractXingUserManager impleme
     private static final String DEFAULT_USER_HASH_PROPERTY = "hash";
 
     @Property(value = "")
-    private static final String SECRET_KEY_PARAMETER = "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.secretKey";
+    private static final String SECRET_KEY_PARAMETER =
+            "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.secretKey";
 
     @Property(value = DEFAULT_USER_DATA_PROPERTY)
-    private static final String USER_DATA_PROPERTY_PARAMETER = "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.user.property.data";
+    private static final String USER_DATA_PROPERTY_PARAMETER =
+            "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.user.property.data";
 
     @Property(value = DEFAULT_USER_HASH_PROPERTY)
-    private static final String USER_HASH_PROPERTY_PARAMETER = "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.user.property.hash";
+    private static final String USER_HASH_PROPERTY_PARAMETER =
+            "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.user.property.hash";
 
     @Property(boolValue = DEFAULT_AUTO_CREATE_USER)
-    private static final String AUTO_CREATE_USER_PARAMETER = "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.user.create.auto";
+    private static final String AUTO_CREATE_USER_PARAMETER =
+            "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.user.create.auto";
 
     @Property(boolValue = DEFAULT_AUTO_UPDATE_USER)
-    private static final String AUTO_UPDATE_USER_PARAMETER = "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.user.update.auto";
+    private static final String AUTO_UPDATE_USER_PARAMETER =
+            "org.apache.sling.auth.xing.login.impl.DefaultXingLoginUserManager.user.update.auto";
 
     private final Logger logger = LoggerFactory.getLogger(DefaultXingLoginUserManager.class);
 
-    public DefaultXingLoginUserManager() {
-    }
+    public DefaultXingLoginUserManager() {}
 
     @Activate
     protected void activate(final ComponentContext componentContext) {
@@ -119,9 +122,14 @@ public class DefaultXingLoginUserManager extends AbstractXingUserManager impleme
 
     protected synchronized void configure(final ComponentContext componentContext) {
         final Dictionary properties = componentContext.getProperties();
-        secretKey = PropertiesUtil.toString(properties.get(SECRET_KEY_PARAMETER), "").trim();
-        userDataProperty = PropertiesUtil.toString(properties.get(USER_DATA_PROPERTY_PARAMETER), DEFAULT_USER_DATA_PROPERTY).trim();
-        userHashProperty = PropertiesUtil.toString(properties.get(USER_HASH_PROPERTY_PARAMETER), DEFAULT_USER_HASH_PROPERTY).trim();
+        secretKey = PropertiesUtil.toString(properties.get(SECRET_KEY_PARAMETER), "")
+                .trim();
+        userDataProperty = PropertiesUtil.toString(
+                        properties.get(USER_DATA_PROPERTY_PARAMETER), DEFAULT_USER_DATA_PROPERTY)
+                .trim();
+        userHashProperty = PropertiesUtil.toString(
+                        properties.get(USER_HASH_PROPERTY_PARAMETER), DEFAULT_USER_HASH_PROPERTY)
+                .trim();
         autoCreateUser = PropertiesUtil.toBoolean(properties.get(AUTO_CREATE_USER_PARAMETER), DEFAULT_AUTO_CREATE_USER);
         autoUpdateUser = PropertiesUtil.toBoolean(properties.get(AUTO_UPDATE_USER_PARAMETER), DEFAULT_AUTO_UPDATE_USER);
 
@@ -210,5 +218,4 @@ public class DefaultXingLoginUserManager extends AbstractXingUserManager impleme
         }
         return null;
     }
-
 }

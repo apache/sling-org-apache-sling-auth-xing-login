@@ -18,14 +18,14 @@
  */
 package org.apache.sling.auth.xing.login.impl;
 
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 import java.io.IOException;
 import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.Hashtable;
-
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.felix.scr.annotations.Activate;
@@ -50,20 +50,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Component(
-    label = "Apache Sling Authentication XING Login “Authentication Handler”",
-    description = "Authentication Handler for Sling Authentication XING Login",
-    immediate = true,
-    metatype = true
-)
+        label = "Apache Sling Authentication XING Login “Authentication Handler”",
+        description = "Authentication Handler for Sling Authentication XING Login",
+        immediate = true,
+        metatype = true)
 @Service
 @Properties({
     @Property(name = Constants.SERVICE_VENDOR, value = XingLogin.SERVICE_VENDOR),
-    @Property(name = Constants.SERVICE_DESCRIPTION, value = "Authentication Handler for Sling Authentication XING Login"),
+    @Property(
+            name = Constants.SERVICE_DESCRIPTION,
+            value = "Authentication Handler for Sling Authentication XING Login"),
     @Property(name = Constants.SERVICE_RANKING, intValue = 0, propertyPrivate = false),
     @Property(name = AuthenticationHandler.PATH_PROPERTY, value = "/", unbounded = PropertyUnbounded.ARRAY),
     @Property(name = AuthenticationHandler.TYPE_PROPERTY, value = XingLogin.AUTH_TYPE, propertyPrivate = true)
 })
-public class XingLoginAuthenticationHandler extends DefaultAuthenticationFeedbackHandler implements AuthenticationHandler {
+public class XingLoginAuthenticationHandler extends DefaultAuthenticationFeedbackHandler
+        implements AuthenticationHandler {
 
     private String consumerKey;
 
@@ -88,27 +90,32 @@ public class XingLoginAuthenticationHandler extends DefaultAuthenticationFeedbac
     private static final int DEFAULT_MAX_COOKIE_SIZE = 4096;
 
     @Property(value = "")
-    private static final String CONSUMER_KEY_PARAMETER = "org.apache.sling.auth.xing.login.impl.XingLoginAuthenticationHandler.consumerKey";
+    private static final String CONSUMER_KEY_PARAMETER =
+            "org.apache.sling.auth.xing.login.impl.XingLoginAuthenticationHandler.consumerKey";
 
     @Property(value = DEFAULT_USER_COOKIE)
-    private static final String USER_COOKIE_PARAMETER = "org.apache.sling.auth.xing.login.impl.XingLoginAuthenticationHandler.cookie.user";
+    private static final String USER_COOKIE_PARAMETER =
+            "org.apache.sling.auth.xing.login.impl.XingLoginAuthenticationHandler.cookie.user";
 
     @Property(value = DEFAULT_USERID_COOKIE)
-    private static final String USERID_COOKIE_PARAMETER = "org.apache.sling.auth.xing.login.impl.XingLoginAuthenticationHandler.cookie.userid";
+    private static final String USERID_COOKIE_PARAMETER =
+            "org.apache.sling.auth.xing.login.impl.XingLoginAuthenticationHandler.cookie.userid";
 
     @Property(intValue = DEFAULT_MAX_COOKIE_SIZE)
-    private static final String MAX_COOKIE_SIZE_PARAMETER = "org.apache.sling.auth.xing.login.impl.XingLoginAuthenticationHandler.cookie.maxSize";
+    private static final String MAX_COOKIE_SIZE_PARAMETER =
+            "org.apache.sling.auth.xing.login.impl.XingLoginAuthenticationHandler.cookie.maxSize";
 
     @Property
-    private static final String LOGIN_PATH_PARAMETER = "org.apache.sling.auth.xing.login.impl.XingLoginAuthenticationHandler.login.path";
+    private static final String LOGIN_PATH_PARAMETER =
+            "org.apache.sling.auth.xing.login.impl.XingLoginAuthenticationHandler.login.path";
 
     @Property
-    private static final String LOGOUT_PATH_PARAMETER = "org.apache.sling.auth.xing.login.impl.XingLoginAuthenticationHandler.logout.path";
+    private static final String LOGOUT_PATH_PARAMETER =
+            "org.apache.sling.auth.xing.login.impl.XingLoginAuthenticationHandler.logout.path";
 
     private final Logger logger = LoggerFactory.getLogger(XingLoginAuthenticationHandler.class);
 
-    public XingLoginAuthenticationHandler() {
-    }
+    public XingLoginAuthenticationHandler() {}
 
     @Activate
     protected void activate(final ComponentContext ComponentContext) {
@@ -133,12 +140,17 @@ public class XingLoginAuthenticationHandler extends DefaultAuthenticationFeedbac
 
     protected void configure(final ComponentContext context) {
         final Dictionary properties = context.getProperties();
-        consumerKey = PropertiesUtil.toString(properties.get(CONSUMER_KEY_PARAMETER), "").trim();
-        userCookie = PropertiesUtil.toString(properties.get(USER_COOKIE_PARAMETER), DEFAULT_USER_COOKIE).trim();
-        userIdCookie = PropertiesUtil.toString(properties.get(USERID_COOKIE_PARAMETER), DEFAULT_USERID_COOKIE).trim();
+        consumerKey = PropertiesUtil.toString(properties.get(CONSUMER_KEY_PARAMETER), "")
+                .trim();
+        userCookie = PropertiesUtil.toString(properties.get(USER_COOKIE_PARAMETER), DEFAULT_USER_COOKIE)
+                .trim();
+        userIdCookie = PropertiesUtil.toString(properties.get(USERID_COOKIE_PARAMETER), DEFAULT_USERID_COOKIE)
+                .trim();
         maxCookieSize = PropertiesUtil.toInteger(properties.get(MAX_COOKIE_SIZE_PARAMETER), DEFAULT_MAX_COOKIE_SIZE);
-        loginPath = PropertiesUtil.toString(properties.get(LOGIN_PATH_PARAMETER), "").trim();
-        logoutPath = PropertiesUtil.toString(properties.get(LOGOUT_PATH_PARAMETER), "").trim();
+        loginPath = PropertiesUtil.toString(properties.get(LOGIN_PATH_PARAMETER), "")
+                .trim();
+        logoutPath = PropertiesUtil.toString(properties.get(LOGOUT_PATH_PARAMETER), "")
+                .trim();
 
         if (StringUtils.isEmpty(consumerKey)) {
             logger.warn("configured consumer key is empty");
@@ -155,16 +167,22 @@ public class XingLoginAuthenticationHandler extends DefaultAuthenticationFeedbac
             logger.warn("configured login path is empty");
         } else {
             final Dictionary<String, Object> loginPathProperties = new Hashtable<String, Object>();
-            final String[] authRequirements = new String[]{"-".concat(loginPath)};
+            final String[] authRequirements = new String[] {"-".concat(loginPath)};
             loginPathProperties.put(AuthConstants.AUTH_REQUIREMENTS, authRequirements);
-            loginPageRegistration = context.getBundleContext().registerService(Object.class.getName(), new Object(), loginPathProperties);
+            loginPageRegistration = context.getBundleContext()
+                    .registerService(Object.class.getName(), new Object(), loginPathProperties);
         }
 
         if (StringUtils.isEmpty(logoutPath)) {
             logger.warn("configured logout path is empty");
         }
 
-        logger.info("configured with consumer key '{}', cookie name '{}', login path '{}' and logout path '{}'", consumerKey, xingCookie, loginPath, logoutPath);
+        logger.info(
+                "configured with consumer key '{}', cookie name '{}', login path '{}' and logout path '{}'",
+                consumerKey,
+                xingCookie,
+                loginPath,
+                logoutPath);
     }
 
     /**
@@ -211,7 +229,8 @@ public class XingLoginAuthenticationHandler extends DefaultAuthenticationFeedbac
     }
 
     @Override
-    public boolean requestCredentials(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    public boolean requestCredentials(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException {
         logger.debug("request credentials");
         if (!loginPath.equals(request.getServletPath())) {
             final String target = request.getContextPath().concat(loginPath);
@@ -222,7 +241,8 @@ public class XingLoginAuthenticationHandler extends DefaultAuthenticationFeedbac
     }
 
     @Override
-    public void dropCredentials(final HttpServletRequest request, final HttpServletResponse response) throws IOException {
+    public void dropCredentials(final HttpServletRequest request, final HttpServletResponse response)
+            throws IOException {
         logger.debug("drop credentials");
         // delete cookies
         deleteCookies(request, response);
@@ -258,5 +278,4 @@ public class XingLoginAuthenticationHandler extends DefaultAuthenticationFeedbac
             }
         }
     }
-
 }
